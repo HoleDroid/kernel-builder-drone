@@ -57,7 +57,7 @@ MANUFACTURERINFO="ASUSTek Computer Inc."
 # Kernel Variant
 NAMA=FOX
 
-JENIS=Stable
+JENIS=LV
 
 VARIAN=LTO
 # Build Type
