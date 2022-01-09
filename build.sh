@@ -406,7 +406,7 @@ gen_zip() {
 	sed -i "s/build.date=.*/build.date=$DATE2/g" anykernel.sh
 
 	cd $AK_DIR
-	zip -r9 "$KERNELNAME.zip" * -x .git README.md anykernel-real.sh .gitignore zipsigner* *.zip
+	zip -r9 "$KERNELNAME.zip" * -x .git README.md anykernel-real.sh .gitignore zipsigner *.zip
 
 	## Prepare a final zip variable
 	ZIP_FINAL="$ZIPNAME"
