@@ -56,7 +56,7 @@ MANUFACTURERINFO="ASUSTek Computer Inc."
 
 # Kernel Variant
 NAMA=TheOneMemory
-JENIS=Onyx
+JENIS=Hayzel
 VARIAN=HMP
 
 # Build Type
