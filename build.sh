@@ -56,7 +56,7 @@ MANUFACTURERINFO="ASUSTek Computer Inc."
 
 # Kernel Variant
 NAMA=TheOneMemory
-JENIS=Onyx
+JENIS=Hayzel
 VARIAN=HMP
 
 # Build Type
@@ -196,7 +196,7 @@ setversioning() {
 exports() {
 	export KBUILD_BUILD_USER="nobody"
     export KBUILD_BUILD_HOST="android-build"
-    export KBUILD_BUILD_VERSION="1524"
+    export KBUILD_BUILD_VERSION="1605"
 	export ARCH=arm64
 	export SUBARCH=arm64
 
