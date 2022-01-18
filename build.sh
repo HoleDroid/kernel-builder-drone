@@ -196,7 +196,7 @@ setversioning() {
 exports() {
 	export KBUILD_BUILD_USER="nobody"
     export KBUILD_BUILD_HOST="android-build"
-    export KBUILD_BUILD_VERSION="1512"
+    export KBUILD_BUILD_VERSION="1531"
 	export ARCH=arm64
 	export SUBARCH=arm64
 
