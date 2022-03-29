@@ -217,7 +217,7 @@ exports() {
 	fi
 
 	if [ $LTO = "1" ];then
-		export LD="ld.lld"
+        export LD="ld.lld"
         export LD_LIBRARY_PATH=$TC_DIR/lib
 	fi
 
@@ -399,53 +399,34 @@ gen_zip() {
 	cd AnyKernel3 || exit
         cp -af anykernel-real.sh anykernel.sh
 	sed -i "s/kernel.string=.*/kernel.string=$NAMA-$JENIS/g" anykernel.sh
-	sed -i "s/kernel.for=.*/kernel.for=$JENIS/g" anykernel.sh
+	sed -i "s/kernel.for=.*/kernel.for=$VARIAN/g" anykernel.sh
 	sed -i "s/kernel.compiler=.*/kernel.compiler=$KBUILD_COMPILER_STRING/g" anykernel.sh
 	sed -i "s/kernel.made=.*/kernel.made=Kneba/g" anykernel.sh
 	sed -i "s/kernel.version=.*/kernel.version=$LINUXVER/g" anykernel.sh
 	sed -i "s/message.word=.*/message.word=$MESSAGE/g" anykernel.sh
 	sed -i "s/build.date=.*/build.date=$DATE2/g" anykernel.sh
 
-	cd $AK_DIR
-	zip -r9 "$KERNELNAME.zip" * -x .git README.md anykernel-real.sh .gitignore zipsigner-3.0.jar *.zip
+	zip -r9 "$ZIPNAME" * -x .git README.md anykernel-real.sh .gitignore zipsigner* *.zip
 
 	## Prepare a final zip variable
 	ZIP_FINAL="$ZIPNAME"
-
-	if [ $SIGN = 1 ]
-	then
-		## Sign the zip before sending it to telegram
-		if [ "$PTTG" = 1 ]
- 		then
- 			msg "|| Signing Zip ||"
-			tg_post_msg "<code>Signing Zip file with AOSP keys..</code>"
- 		fi
-		cd $AK_DIR
-		java -jar zipsigner-3.0.jar $KERNELNAME.zip $KERNELNAME-signed.zip
-		ZIP_FINAL="$ZIP_FINAL-signed"
-	fi
-
-	if [ "$PTTG" = 1 ]
- 	then
-		tg_send_files "$1"
-	fi
-
+	
 	curl --progress-bar -F document=@"$ZIPNAME" "https://api.telegram.org/bot$TOKEN/sendDocument" \
         -F chat_id="$CHATID"  \
         -F "disable_web_page_preview=true" \
         -F "parse_mode=html" \
         -F caption="✅<b>Build Done</b>
         - <code>$((DIFF / 60)) minute(s) $((DIFF % 60)) second(s) </code>
-
+        
         <b>📅 Build Date: </b>
         -<code>$DATE2</code>
-
+        
         <b>🐧 Linux Version: </b>
         -<code>$LINUXVER</code>
-
+        
          <b>💿 Compiler: </b>
         -<code>$KBUILD_COMPILER_STRING</code>
-
+        
         <b>📱 Device: </b>
         -<code>$DEVICE ($MANUFACTURERINFO)</code>
 
@@ -453,7 +434,7 @@ gen_zip() {
         - <code>$COMMIT_HEAD</code>
         <b></b>
         #$NAMA #$JENIS #$BUILD_TYPE"
-
+        
 	cd ..
 }
 
