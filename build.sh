@@ -185,7 +185,7 @@ DATE2=$(TZ=Europe/Moscow date +"%Y%m%d")
 # Function to replace defconfig versioning
 setversioning() {
     # For staging branch
-    KERNELNAME="$NAMA-$VARIAN-$JENIS-$LINUXVER"
+    KERNELNAME="$NAMA-$JENIS-$VARIAN-$LINUXVER"
     # Export our new localversion and zipnames
     export KERNELNAME
     export ZIPNAME="$KERNELNAME.zip"
@@ -398,7 +398,7 @@ gen_zip() {
 	fi
 	cd AnyKernel3 || exit
         cp -af anykernel-real.sh anykernel.sh
-	sed -i "s/kernel.string=.*/kernel.string=$NAMA-$VARIAN/g" anykernel.sh
+	sed -i "s/kernel.string=.*/kernel.string=$NAMA-$JENIS/g" anykernel.sh
 	sed -i "s/kernel.for=.*/kernel.for=$JENIS/g" anykernel.sh
 	sed -i "s/kernel.compiler=.*/kernel.compiler=$KBUILD_COMPILER_STRING/g" anykernel.sh
 	sed -i "s/kernel.made=.*/kernel.made=Kneba/g" anykernel.sh
@@ -407,7 +407,10 @@ gen_zip() {
 	sed -i "s/build.date=.*/build.date=$DATE2/g" anykernel.sh
 
 	cd $AK_DIR
-	zip -r9 "$KERNELNAME.zip" * -x .git README.md anykernel-real.sh .gitignore zipsigner* *.zip
+	zip -r9 "$KERNELNAME.zip" * -x .git README.md anykernel-real.sh .gitignore zipsigner-3.0.jar *.zip
+
+	## Prepare a final zip variable
+	ZIP_FINAL="$ZIPNAME"
 
 	if [ $SIGN = 1 ]
 	then
@@ -419,15 +422,13 @@ gen_zip() {
  		fi
 		cd $AK_DIR
 		java -jar zipsigner-3.0.jar $KERNELNAME.zip $KERNELNAME-signed.zip
+		ZIP_FINAL="$ZIP_FINAL-signed"
 	fi
 
 	if [ "$PTTG" = 1 ]
  	then
 		tg_send_files "$1"
 	fi
-
-	## Prepare a final zip variable
-	ZIP_FINAL="$ZIPNAME"
 
 	curl --progress-bar -F document=@"$ZIPNAME" "https://api.telegram.org/bot$TOKEN/sendDocument" \
         -F chat_id="$CHATID"  \
