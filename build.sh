@@ -425,7 +425,6 @@ gen_zip() {
  	then
 		tg_send_files "$1"
 	fi
-}
 
 	## Prepare a final zip variable
 	ZIP_FINAL="$ZIPNAME"
