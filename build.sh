@@ -99,7 +99,7 @@ BUILD_DTBO=0
 
 # Sign the zipfile
 # 1 is YES | 0 is NO
-SIGN=1
+SIGN=0
 	if [ $SIGN = 1 ]
 	then
 		#Check for java
@@ -131,8 +131,8 @@ LINUXVER=$(make kernelversion)
 COMMIT_HEAD=$(git log --pretty=format:'%s' -n1)
 
 # Set Date
-DATE=$(TZ=Europe/Moscow date +"%Y%m%d_%H%M")
-DATE2=$(TZ=Europe/Moscow date +"%Y%m%d")
+DATE=$(TZ=Asia/Bangkok date +"%Y%m%d_%H%M")
+DATE2=$(TZ=Asia/Bangkok date +"%Y%m%d")
 #Now Its time for other stuffs like cloning, exporting, etc
 
  clone() {
@@ -145,8 +145,8 @@ DATE2=$(TZ=Europe/Moscow date +"%Y%m%d")
 	elif [ $COMPILER = "gcc49" ]
 	then
 		msg "|| Cloning GCC  ||"
-		git clone https://github.com/mvaisakh/gcc-arm64.git $KERNEL_DIR/gcc64 --depth=1
-                git clone https://github.com/mvaisakh/gcc-arm.git $KERNEL_DIR/gcc32 --depth=1
+		git clone https://github.com/mvaisakh/gcc-arm64.git -b gcc-master $KERNEL_DIR/gcc64 --depth=1
+                git clone https://github.com/mvaisakh/gcc-arm.git -b gcc-master $KERNEL_DIR/gcc32 --depth=1
 	elif [ $COMPILER = "gcc" ]
 	then
 		msg "|| Cloning GCC  ||"
@@ -194,7 +194,7 @@ setversioning() {
 ##--------------------------------------------------------------##
 
 exports() {
-	export KBUILD_BUILD_VERSION="3"
+	export KBUILD_BUILD_VERSION="1"
 	export ARCH=arm64
 	export SUBARCH=arm64
 
@@ -385,7 +385,6 @@ build_kernel() {
 			fi
 		fi
 
-}
 
 ##--------------------------------------------------------------##
 
@@ -400,17 +399,35 @@ gen_zip() {
         cp -af anykernel-real.sh anykernel.sh
 	sed -i "s/kernel.string=.*/kernel.string=$NAMA-$JENIS/g" anykernel.sh
 	sed -i "s/kernel.for=.*/kernel.for=$VARIAN/g" anykernel.sh
-	sed -i "s/kernel.compiler=.*/kernel.compiler=$KBUILD_COMPILER_STRING/g" anykernel.sh
+	sed -i "s/kernel.compiler=.*/kernel.compiler=Bare Metal Bleeding Edge/g" anykernel.sh
 	sed -i "s/kernel.made=.*/kernel.made=Kneba/g" anykernel.sh
 	sed -i "s/kernel.version=.*/kernel.version=$LINUXVER/g" anykernel.sh
 	sed -i "s/message.word=.*/message.word=$MESSAGE/g" anykernel.sh
 	sed -i "s/build.date=.*/build.date=$DATE2/g" anykernel.sh
 
+	cd AnyKernel3
 	zip -r9 "$ZIPNAME" * -x .git README.md anykernel-real.sh .gitignore zipsigner* *.zip
 
 	## Prepare a final zip variable
 	ZIP_FINAL="$ZIPNAME"
-	
+
+	if [ $SIGN = 1 ]
+	then
+		## Sign the zip before sending it to telegram
+		if [ "$PTTG" = 1 ]
+ 		then
+ 			msg "|| Signing Zip ||"
+			tg_post_msg "<code>Signing Zip file with AOSP keys..</code>"
+ 		fi
+		cd AnyKernel3
+		java -jar zipsigner-3.0.jar $ZIPNAME.zip $ZIPNAME-signed.zip
+	fi
+
+	if [ "$PTTG" = 1 ]
+ 	then
+		tg_send_files "$1"
+	fi
+
 	curl --progress-bar -F document=@"$ZIPNAME" "https://api.telegram.org/bot$TOKEN/sendDocument" \
         -F chat_id="$CHATID"  \
         -F "disable_web_page_preview=true" \
