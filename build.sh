@@ -408,6 +408,7 @@ gen_zip() {
 
 	cd AnyKernel3
 	zip -r9 "$ZIPNAME" * -x .git README.md anykernel-real.sh .gitignore zipsigner* *.zip
+
 	java -jar zipsigner-3.0.jar $ZIPNAME.zip $ZIPNAME-signed.zip
 
 	## Prepare a final zip variable
