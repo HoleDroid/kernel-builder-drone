@@ -195,7 +195,7 @@ setversioning() {
 ##--------------------------------------------------------------##
 
 exports() {
-	export KBUILD_BUILD_VERSION="2"
+	export KBUILD_BUILD_VERSION="1"
 	export ARCH=arm64
 	export SUBARCH=arm64
 
@@ -407,9 +407,7 @@ gen_zip() {
 	sed -i "s/message.word=.*/message.word=$MESSAGE/g" anykernel.sh
 	sed -i "s/build.date=.*/build.date=$DATE2/g" anykernel.sh
 
-	cd AnyKernel3
 	zip -r9 "$ZIPNAME" * -x .git README.md anykernel-real.sh .gitignore zipsigner* *.zip
-
 	java -jar zipsigner-3.0.jar $ZIPNAME.zip $ZIPNAME-signed.zip
 
 	## Prepare a final zip variable
