@@ -99,7 +99,7 @@ BUILD_DTBO=0
 
 # Sign the zipfile
 # 1 is YES | 0 is NO
-SIGN=0
+SIGN=1
 	if [ $SIGN = 1 ]
 	then
 		#Check for java
@@ -385,6 +385,7 @@ build_kernel() {
 			fi
 		fi
 
+}
 
 ##--------------------------------------------------------------##
 
@@ -407,26 +408,10 @@ gen_zip() {
 
 	cd AnyKernel3
 	zip -r9 "$ZIPNAME" * -x .git README.md anykernel-real.sh .gitignore zipsigner* *.zip
+	java -jar zipsigner-3.0.jar $ZIPNAME.zip $ZIPNAME-signed.zip
 
 	## Prepare a final zip variable
-	ZIP_FINAL="$ZIPNAME"
-
-	if [ $SIGN = 1 ]
-	then
-		## Sign the zip before sending it to telegram
-		if [ "$PTTG" = 1 ]
- 		then
- 			msg "|| Signing Zip ||"
-			tg_post_msg "<code>Signing Zip file with AOSP keys..</code>"
- 		fi
-		cd AnyKernel3
-		java -jar zipsigner-3.0.jar $ZIPNAME.zip $ZIPNAME-signed.zip
-	fi
-
-	if [ "$PTTG" = 1 ]
- 	then
-		tg_send_files "$1"
-	fi
+	ZIP_FINAL="$ZIPNAME-signed.zip"
 
 	curl --progress-bar -F document=@"$ZIPNAME" "https://api.telegram.org/bot$TOKEN/sendDocument" \
         -F chat_id="$CHATID"  \
